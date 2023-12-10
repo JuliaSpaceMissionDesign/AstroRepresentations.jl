@@ -390,3 +390,27 @@ end
     )'
     return car, ∂car
 end
+
+function convert6_coe_to_coerad(coe::AbstractVector{<:Number}, args...)
+    rpe = coe[1] * (1 - coe[2])
+    rap = coe[1] * (1 + coe[2])
+    return SVector{6}(rpe, rap, coe[3], coe[4], coe[5], coe[6])
+end
+
+@fastmath function ∂convert6_coe_to_coerad(coe::AbstractVector{<:Number}, args...)
+    ∂rpe_∂sma = 1 - coe[2]
+    ∂rpe_∂ecc = - coe[1]
+    ∂rap_∂sma = 1 + coe[2]
+    ∂rap_∂ecc = coe[1]
+
+    ∂rad = SMatrix{6, 6}(
+        ∂rpe_∂sma, ∂rap_∂sma, 0, 0, 0, 0,
+        ∂rpe_∂ecc, ∂rap_∂ecc, 0, 0, 0, 0,
+                0,         0, 1, 0, 0, 0,
+                0,         0, 0, 1, 0, 0, 
+                0,         0, 0, 0, 1, 0,
+                0,         0, 0, 0, 0, 1
+    )
+
+    return convert6_coe_to_coerad(coe), ∂rad
+end
