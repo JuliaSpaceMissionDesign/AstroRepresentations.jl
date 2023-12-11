@@ -1,4 +1,4 @@
-@testset "Keplerian -> Cartesian" verbose=true begin
+@testset "Keplerian" verbose=true begin
 
     @testset "conversion" begin
         # Vallado, D. A. (2013), pg. 114
@@ -32,8 +32,8 @@
 
     @testset "consistency" verbose=true begin
         @testset "cart -> coe -> cart" begin
-            for μ in ( 1e3)
-                for pz in ( -1., 0., 1. )
+            for μ in (1e3, 1e5, 1e11)
+                for pz in (-1., 0., 1.)
                     for α in LinRange(0., 2π, 18)
                         dist = 1.
                         for i in 1:7

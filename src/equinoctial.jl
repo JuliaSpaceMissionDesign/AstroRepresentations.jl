@@ -1,3 +1,6 @@
+export convert6_cart_to_equi, convert6_equi_to_cart, 
+       convert6_coe_to_equi
+
 """
     convert6_cart_to_equi(sv::AbstractVector{<:Number}, μ::Number, [args]...)
 
