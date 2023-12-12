@@ -1,4 +1,4 @@
-module JSMDAstroRepresentations
+module AstroRepresentations
 
 using StaticArrays
 using LinearAlgebra

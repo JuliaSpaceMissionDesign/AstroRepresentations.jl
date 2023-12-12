@@ -17,67 +17,6 @@ Classical orbital elements representation of the state as a `SVector{6}`.
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
   Springer Science & Business Media, 2001.
 """
-convert6_cart_to_coe
-
-"""
-    ∂convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, [args]...)
-
-Convert cartesian state representation into classical orbital elements. Compute also the full
-jacobian of the elements wrt the cartesian state.
-
-### Inputs 
-- `sv` -- state vector -- `L, T`
-- `μ` -- center gravitational parameter  -- `L³/T²`
-
-### Output
-Classical Orbital Elements representation of the state as a `SVector{6}` and its jacobian as 
-a `SMatrix{6, 6}`.
-
-### References 
-- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
-  Springer Science & Business Media, 2001.
-- Pasquale, A. - *Multiple Shooting Optimiser (MSO)*. Technical Note 0001, 2022.
-"""
-∂convert6_cart_to_coe
-
-"""
-    convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
-
-Convert classical orbital elements state vector to cartesian state.
-
-### Inputs 
-- `sv` -- Keplerian elements -- `L, rad`
-- `μ` -- Center's gravitational parameter  -- `L³/T²`
-
-### Output 
-Cartesian representation of the state as a `SVector{6}`.
-
-### References 
-- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
-  Springer Science & Business Media, 2001.
-"""
-convert6_coe_to_cart
-
-"""
-    ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
-
-Convert classical orbital elements state vector to cartesian state. Compute also the full
-jacobian of the cartesian states wrt the elements.
-
-### Inputs 
-- `sv` -- cartesian state representation -- `L, rad`
-- `μ` -- Center's gravitational parameter  -- `L³/T²`
-
-### Output 
-Cartesian representation of the state as a `SVector{6}` and its jacobian as a `SMatrix{6, 6}`.
-
-### References 
-- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
-  Springer Science & Business Media, 2001.
-- Pasquale, A. - *Multiple Shooting Optimiser (MSO)*. Technical Note 0001, 2022.
-"""
-∂convert6_coe_to_cart
-
 @fastmath function convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, args...)
 
     @inbounds R = SVector{3}(sv[1], sv[2], sv[3])
@@ -118,10 +57,29 @@ Cartesian representation of the state as a `SVector{6}` and its jacobian as a `S
     return SVector{6}(sma, ecc, inc, ran, aop, ta)
 end
 
-@inbounds @fastmath function ∂convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, args...)
+"""
+    ∂convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, [args]...)
 
-    R = SVector{3}(sv[1], sv[2], sv[3])
-    V = SVector{3}(sv[4], sv[5], sv[6])
+Convert cartesian state representation into classical orbital elements. Compute also the full
+jacobian of the elements wrt the cartesian state.
+
+### Inputs 
+- `sv` -- state vector -- `L, T`
+- `μ` -- center gravitational parameter  -- `L³/T²`
+
+### Output
+Classical Orbital Elements representation of the state as a `SVector{6}` and its jacobian as 
+a `SMatrix{6, 6}`.
+
+### References 
+- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
+  Springer Science & Business Media, 2001.
+- Pasquale, A. - *Multiple Shooting Optimiser (MSO)*. Technical Note 0001, 2022.
+"""
+@fastmath function ∂convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, args...)
+
+    @inbounds R = SVector{3}(sv[1], sv[2], sv[3])
+    @inbounds V = SVector{3}(sv[4], sv[5], sv[6])
     K = SVector{3}(0., 0., 1.)
     
     r = norm(R)
@@ -173,11 +131,11 @@ end
     SxVt = SxV'
 
     circular = ecc < 1e-12 
-    equatorial = H[1]*H[1] + H[2]*H[2] < 1e-12  
+    @inbounds equatorial = H[1]*H[1] + H[2]*H[2] < 1e-12  
 
     if !circular && !equatorial 
 
-        h12 = sqrt(H[1]*H[1] + H[2]*H[2])
+        @inbounds h12 = sqrt(H[1]*H[1] + H[2]*H[2])
         ∂i∂H = SVector{3}(
             H[1]*H[3]/(h² * h12), H[2]*H[3]/(h² * h12), -h12/h²
         )
@@ -274,6 +232,22 @@ end
     return kep, ∂kep∂s
 end
 
+"""
+    convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
+
+Convert classical orbital elements state vector to cartesian state.
+
+### Inputs 
+- `sv` -- Keplerian elements -- `L, rad`
+- `μ` -- Center's gravitational parameter  -- `L³/T²`
+
+### Output 
+Cartesian representation of the state as a `SVector{6}`.
+
+### References 
+- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
+  Springer Science & Business Media, 2001.
+"""
 function convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...) 
     @inbounds sma, ecc, inc, ran, aop, ta = @views(sv[1:6]) 
     p = sma*(1-ecc*ecc)
@@ -305,6 +279,24 @@ function convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...)
     )
 end
 
+"""
+    ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
+
+Convert classical orbital elements state vector to cartesian state. Compute also the full
+jacobian of the cartesian states wrt the elements.
+
+### Inputs 
+- `sv` -- cartesian state representation -- `L, rad`
+- `μ` -- Center's gravitational parameter  -- `L³/T²`
+
+### Output 
+Cartesian representation of the state as a `SVector{6}` and its jacobian as a `SMatrix{6, 6}`.
+
+### References 
+- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
+  Springer Science & Business Media, 2001.
+- Pasquale, A. - *Multiple Shooting Optimiser (MSO)*. Technical Note 0001, 2022.
+"""
 @fastmath function ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...) 
     @inbounds sma, ecc, inc, ran, aop, ta = @views(sv[1:6])  
     e² = ecc*ecc
@@ -389,28 +381,4 @@ end
         ∂V∂a[3],  ∂vx∂e*c3x+∂vy∂e*c3y,  ∂c3x∂i*vx+∂c3y∂i*vy,  0.,                   ∂c3x∂ω*vx+∂c3y∂ω*vy,  ∂vx∂ν*c3x + ∂vy∂ν*c3y,
     )'
     return car, ∂car
-end
-
-function convert6_coe_to_coerad(coe::AbstractVector{<:Number}, args...)
-    rpe = coe[1] * (1 - coe[2])
-    rap = coe[1] * (1 + coe[2])
-    return SVector{6}(rpe, rap, coe[3], coe[4], coe[5], coe[6])
-end
-
-@fastmath function ∂convert6_coe_to_coerad(coe::AbstractVector{<:Number}, args...)
-    ∂rpe_∂sma = 1 - coe[2]
-    ∂rpe_∂ecc = - coe[1]
-    ∂rap_∂sma = 1 + coe[2]
-    ∂rap_∂ecc = coe[1]
-
-    ∂rad = SMatrix{6, 6}(
-        ∂rpe_∂sma, ∂rap_∂sma, 0, 0, 0, 0,
-        ∂rpe_∂ecc, ∂rap_∂ecc, 0, 0, 0, 0,
-                0,         0, 1, 0, 0, 0,
-                0,         0, 0, 1, 0, 0, 
-                0,         0, 0, 0, 1, 0,
-                0,         0, 0, 0, 0, 1
-    )
-
-    return convert6_coe_to_coerad(coe), ∂rad
 end

@@ -1,4 +1,4 @@
-using JSMDAstroRepresentations
+using AstroRepresentations
 using Test
 using ForwardDiff
 using StaticArrays
