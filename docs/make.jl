@@ -14,6 +14,6 @@ makedocs(;
     clean=true,
 )
 
-# deploydocs(;
-#     repo="github.com/JuliaSpaceMissionDesign/FrameTransformations.jl", branch="gh-pages"
-# )
+deploydocs(;
+    repo="github.com/JuliaSpaceMissionDesign/AstroRepresentations.jl", branch="gh-pages"
+)
