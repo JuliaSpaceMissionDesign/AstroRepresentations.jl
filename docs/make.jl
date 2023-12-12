@@ -9,7 +9,10 @@ makedocs(;
     modules=[AstroRepresentations],
     format=Documenter.HTML(; prettyurls=CI, highlights=["yaml"], ansicolor=true),
     pages=[
-        "Trasformations" => "transform.md"
+        "Public API" => [
+           "Angles" => "angles.md",
+           "States" => "states.md"
+        ]
     ],
     clean=true,
 )

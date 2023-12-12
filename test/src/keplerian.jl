@@ -1,3 +1,15 @@
+
+function randcoe_ell()
+    a = rand(0.1:0.1:10.0)
+    e = rand(0.01:0.01:0.999)
+    i = rand(-π/2:π/18:π/2)
+    Ω = rand(-π:π/18:π)
+    ω = rand(-π:π/18:π)
+    ν = rand(-π:π/18:π)
+    return SVector{6}(a, e, i, Ω, ω, ν)
+end
+
+
 @testset "Keplerian" verbose=true begin
 
     @testset "conversion" begin
@@ -18,19 +30,22 @@
         end
     end
     
-    @testset "jacobian" begin
+    @testset "Jacobian: coe -> cart" begin
         sv = SVector{6}(1.0, 0.01, π/3, π/12, -π/2, π/8)
-        μ = 1.0
+        ∂carRef = ForwardDiff.jacobian(x->convert6_coe_to_cart(x, 1.0), sv)
 
-        coeRef = convert6_coe_to_cart(sv, μ)
-        ∂coeRef = ForwardDiff.jacobian(x->convert6_coe_to_cart(x, μ), sv)
+        _, ∂car = ∂convert6_coe_to_cart(sv, 1.0)
+        @test all(isapprox.(∂car, ∂carRef, rtol=1e-12)) 
 
-        coe, ∂coe = ∂convert6_coe_to_cart(sv, μ)
-        @test all(isapprox.(coe, coeRef, rtol=1e-12))
-        @test all(isapprox.(∂coe, ∂coeRef, rtol=1e-12)) 
+        for _ in 1:1000
+            coe = randcoe_ell()
+            ∂carRef = ForwardDiff.jacobian(x->convert6_coe_to_cart(x, 1.0), coe)
+            _, ∂car = ∂convert6_coe_to_cart(coe, 1.0)
+            @test all(isapprox.(∂car, ∂carRef, atol=1e-12))
+        end
     end
 
-    @testset "consistency" verbose=true begin
+    @testset "Consistency" verbose=true begin
         @testset "cart -> coe -> cart" begin
             for μ in (1e3, 1e5, 1e11)
                 for pz in (-1., 0., 1.)
@@ -84,4 +99,4 @@
         end
     end
 
-end
+end;

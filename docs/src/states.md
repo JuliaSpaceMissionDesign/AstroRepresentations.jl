@@ -1,4 +1,4 @@
-# Transformations
+# State Transformations
 
 ## Classical Orbital Elements (coe)
 
@@ -10,7 +10,7 @@ convert6_coe_to_cart
 ∂convert6_coe_to_cart
 ```
 
-## Equinoctial Orbital Elements (eoe)
+## Equinoctial Orbital Elements (equi)
  
 ```@docs 
 convert6_cart_to_equi
