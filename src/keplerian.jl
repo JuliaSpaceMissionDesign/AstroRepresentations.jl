@@ -1,5 +1,5 @@
 export convert6_cart_to_coe, convert6_coe_to_cart, 
-       ∂convert6_cart_to_coe, ∂convert6_coe_to_cart
+       ∂convert6_cart_to_coe
 
 """
     convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, [args]...)
@@ -279,106 +279,108 @@ function convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...)
     )
 end
 
-"""
-    ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
+# """
+#     ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
 
-Convert classical orbital elements state vector to cartesian state. Compute also the full
-jacobian of the cartesian states wrt the elements.
+# Convert classical orbital elements state vector to cartesian state. Compute also the full
+# jacobian of the cartesian states wrt the elements.
 
-### Inputs 
-- `sv` -- cartesian state representation -- `L, rad`
-- `μ` -- Center's gravitational parameter  -- `L³/T²`
+# ### Inputs 
+# - `sv` -- cartesian state representation -- `L, rad`
+# - `μ` -- Center's gravitational parameter  -- `L³/T²`
 
-### Output 
-Cartesian representation of the state as a `SVector{6}` and its jacobian as a `SMatrix{6, 6}`.
+# ### Output 
+# Cartesian representation of the state as a `SVector{6}` and its jacobian as a `SMatrix{6, 6}`.
 
-### References 
-- Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
-  Springer Science & Business Media, 2001.
-- Pasquale, A. - *Multiple Shooting Optimiser (MSO)*. Technical Note 0001, 2022.
-"""
-@fastmath function ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...) 
-    @inbounds sma, ecc, inc, ran, aop, ta = @views(sv[1:6])  
-    e² = ecc*ecc
+# ### References 
+# - Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
+#   Springer Science & Business Media, 2001.
+# - Pasquale, A. - *Multiple Shooting Optimiser (MSO)*. Technical Note 0001, 2022.
+# """ # FIXME: not currently working for ran, aop, tan derivatives
+# @fastmath function ∂convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...) 
+#     @inbounds sma, ecc, inc, ran, aop, ta = @views(sv[1:6])  
+#     e² = ecc*ecc
 
-    ∂p∂e = -2*sma*ecc
-    ∂p∂a = 1-e²
+#     ∂p∂e = -2*sma*ecc
+#     ∂p∂a = 1-e²
     
-    p = sma*∂p∂a
+#     p = sma*∂p∂a
 
-    stan, ctan = sincos(ta)
-    r = p/(1 + ecc*ctan)
-    v = sqrt(2μ/r - μ/sma)
-    sran, cran = sincos(ran)
-    sinc, cinc = sincos(inc)
-    saop, caop = sincos(aop)
-    s1 = saop*cinc 
-    s2 = caop*cinc
+#     stan, ctan = sincos(ta)
+#     r = p/(1 + ecc*ctan)
+#     v = sqrt(2μ/r - μ/sma)
+#     sran, cran = sincos(ran)
+#     sinc, cinc = sincos(inc)
+#     saop, caop = sincos(aop)
+#     s1 = saop*cinc 
+#     s2 = caop*cinc
 
-    c1x = caop*cran - s1*sran
-    c1y = saop*cran + s2*sran
-    c2x = caop*sran + s1*cran 
-    c2y = s2*cran - saop*sran
-    c3x = saop*sinc 
-    c3y = caop*sinc
+#     c1x = caop*cran - s1*sran
+#     c1y = saop*cran + s2*sran
+#     c2x = caop*sran + s1*cran 
+#     c2y = s2*cran - saop*sran
+#     c3x = saop*sinc 
+#     c3y = caop*sinc
 
-    rx = r*ctan
-    ry = r*stan
-    μop = sqrt(μ/p) 
-    vx = -μop*stan
-    vy = μop*(ecc + ctan)
+#     rx = r*ctan
+#     ry = r*stan
+#     μop = sqrt(μ/p) 
+#     vx = -μop*stan
+#     vy = μop*(ecc + ctan)
 
-    R = SVector{3}(rx*c1x - ry*c1y, rx*c2x + ry*c2y, rx*c3x + ry*c3y) 
-    V = SVector{3}(vx*c1x - vy*c1y, vx*c2x + vy*c2y, vx*c3x + vy*c3y) 
+#     R = SVector{3}(rx*c1x - ry*c1y, rx*c2x + ry*c2y, rx*c3x + ry*c3y) 
+#     V = SVector{3}(vx*c1x - vy*c1y, vx*c2x + vy*c2y, vx*c3x + vy*c3y) 
 
-    # partials (sma)
-    ∂R∂a = R/sma 
-    ∂V∂a = μ/(2*sma*v^2)*(1/sma-2/r)*V
+#     # partials (sma)
+#     ∂R∂a = R/sma 
+#     ∂V∂a = μ/(2*sma*v^2)*(1/sma-2/r)*V
 
-    # partials (ecc)
-    tmp = p/r
-    ∂r∂e = (∂p∂e*tmp - ctan*p)/tmp^2
-    ∂R∂e = ∂r∂e * R/r 
-    ∂vx∂e = ecc/(1-e²)*vx
-    ∂vy∂e = ecc/(1-e²)*vy + μop
+#     # partials (ecc)
+#     tmp = p/r
+#     ∂r∂e = (∂p∂e*tmp - ctan*p)/tmp^2
+#     ∂R∂e = ∂r∂e * R/r 
+#     ∂vx∂e = ecc/(1-e²)*vx
+#     ∂vy∂e = ecc/(1-e²)*vy + μop
 
-    # partials (inc)
-    ∂c1x∂i = c3x*sran
-    ∂c1y∂i = -c3y*sran
-    ∂c2x∂i = -c3x*cran
-    ∂c2y∂i = -c3y*cran
-    ∂c3x∂i = s1
-    ∂c3y∂i = s2
+#     # partials (inc)
+#     ∂c1x∂i = c3x*sran
+#     ∂c1y∂i = -c3y*sran
+#     ∂c2x∂i = -c3x*cran
+#     ∂c2y∂i = -c3y*cran
+#     ∂c3x∂i = s1
+#     ∂c3y∂i = s2
 
-    # partials (ran)
-    ∂c1x∂Ω = -c2x
-    ∂c1y∂Ω = c2y
-    ∂c2x∂Ω = c1x
-    ∂c2y∂Ω = -c1y
+#     # partials (ran)
+#     ∂c1x∂Ω = -c2x
+#     ∂c1y∂Ω = c2y
+#     ∂c2x∂Ω = c1x
+#     ∂c2y∂Ω = -c1y
 
-    # partials (aop)
-    ∂c1x∂ω = -c1y
-    ∂c1y∂ω = c1x
-    ∂c2x∂ω = c2y
-    ∂c2y∂ω = -c2x
-    ∂c3x∂ω = c3y
-    ∂c3y∂ω = -c3x
+#     # partials (aop)
+#     ∂c1x∂ω = -c1y
+#     ∂c1y∂ω = c1x
+#     ∂c2x∂ω = c2y
+#     ∂c2y∂ω = -c2x
+#     ∂c3x∂ω = c3y
+#     ∂c3y∂ω = -c3x
 
-    # partials (tan)
-    den = tmp*tmp
-    ∂rx∂ν = -p*stan/den
-    ∂ry∂ν = p*(ecc+ctan)/den
-    ∂vx∂ν = -μop*ctan
-    ∂vy∂ν = -μop*stan
+#     # partials (tan)
+#     den = tmp*tmp
+#     ∂rx∂ν = -p*stan/den
+#     ∂ry∂ν = p*(ecc+ctan)/den
+#     ∂vx∂ν = -μop*ctan
+#     ∂vy∂ν = -μop*stan
 
-    car = vcat(R, V)
-    ∂car = SMatrix{6, 6}(
-        ∂R∂a[1],  ∂R∂e[1],              ∂c1x∂i*rx-∂c1y∂i*ry,  ∂c1x∂Ω*rx-∂c1y∂Ω*ry,  ∂c1x∂ω*rx-∂c1y∂ω*ry,  ∂rx∂ν*c1x - ∂ry∂ν*c1y,
-        ∂R∂a[2],  ∂R∂e[2],              ∂c2x∂i*rx+∂c2y∂i*ry,  ∂c2x∂Ω*rx+∂c2y∂Ω*ry,  ∂c2x∂ω*rx+∂c2y∂ω*ry,  ∂rx∂ν*c2x + ∂ry∂ν*c2y,
-        ∂R∂a[3],  ∂R∂e[3],              ∂c3x∂i*rx+∂c3y∂i*ry,  0.,                   ∂c3x∂ω*rx+∂c3y∂ω*ry,  ∂rx∂ν*c3x + ∂ry∂ν*c3y,
-        ∂V∂a[1],  ∂vx∂e*c1x-∂vy∂e*c1y,  ∂c1x∂i*vx-∂c1y∂i*vy,  ∂c1x∂Ω*vx-∂c1y∂Ω*vy,  ∂c1x∂ω*vx-∂c1y∂ω*vy,  ∂vx∂ν*c1x - ∂vy∂ν*c1y,
-        ∂V∂a[2],  ∂vx∂e*c2x+∂vy∂e*c2y,  ∂c2x∂i*vx+∂c2y∂i*vy,  ∂c2x∂Ω*vx+∂c2y∂Ω*vy,  ∂c2x∂ω*vx+∂c2y∂ω*vy,  ∂vx∂ν*c2x + ∂vy∂ν*c2y,
-        ∂V∂a[3],  ∂vx∂e*c3x+∂vy∂e*c3y,  ∂c3x∂i*vx+∂c3y∂i*vy,  0.,                   ∂c3x∂ω*vx+∂c3y∂ω*vy,  ∂vx∂ν*c3x + ∂vy∂ν*c3y,
-    )'
-    return car, ∂car
-end
+#     car = vcat(R, V)
+#     ∂car = SMatrix{6, 6}(
+#         ∂R∂a[1],  ∂R∂e[1],              ∂c1x∂i*rx-∂c1y∂i*ry,  ∂c1x∂Ω*rx-∂c1y∂Ω*ry,  ∂c1x∂ω*rx-∂c1y∂ω*ry,  ∂rx∂ν*c1x - ∂ry∂ν*c1y,
+#         ∂R∂a[2],  ∂R∂e[2],              ∂c2x∂i*rx+∂c2y∂i*ry,  ∂c2x∂Ω*rx+∂c2y∂Ω*ry,  ∂c2x∂ω*rx+∂c2y∂ω*ry,  ∂rx∂ν*c2x + ∂ry∂ν*c2y,
+#         ∂R∂a[3],  ∂R∂e[3],              ∂c3x∂i*rx+∂c3y∂i*ry,  0.,                   ∂c3x∂ω*rx+∂c3y∂ω*ry,  ∂rx∂ν*c3x + ∂ry∂ν*c3y,
+#         ∂V∂a[1],  ∂vx∂e*c1x-∂vy∂e*c1y,  ∂c1x∂i*vx-∂c1y∂i*vy,  ∂c1x∂Ω*vx-∂c1y∂Ω*vy,  ∂c1x∂ω*vx-∂c1y∂ω*vy,  ∂vx∂ν*c1x - ∂vy∂ν*c1y,
+#         ∂V∂a[2],  ∂vx∂e*c2x+∂vy∂e*c2y,  ∂c2x∂i*vx+∂c2y∂i*vy,  ∂c2x∂Ω*vx+∂c2y∂Ω*vy,  ∂c2x∂ω*vx+∂c2y∂ω*vy,  ∂vx∂ν*c2x + ∂vy∂ν*c2y,
+#         ∂V∂a[3],  ∂vx∂e*c3x+∂vy∂e*c3y,  ∂c3x∂i*vx+∂c3y∂i*vy,  0.,                   ∂c3x∂ω*vx+∂c3y∂ω*vy,  ∂vx∂ν*c3x + ∂vy∂ν*c3y,
+#     )'
+#     return car, ∂car
+# end
+
+

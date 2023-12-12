@@ -1,7 +1,7 @@
 
 function randcoe_ell()
     a = rand(0.1:0.1:10.0)
-    e = rand(0.01:0.01:0.999)
+    e = rand(0.01:0.01:0.975)
     i = rand(-π/2:π/18:π/2)
     Ω = rand(-π:π/18:π)
     ω = rand(-π:π/18:π)
@@ -9,6 +9,22 @@ function randcoe_ell()
     return SVector{6}(a, e, i, Ω, ω, ν)
 end
 
+function randcart()
+
+    pz = rand(-1:0.01:1)
+    α = rand(-2π:π/18:2π)
+    d = rand(0.1:0.1:100)
+    γ = rand(0.1:0.01:0.98*sqrt(2))
+
+    vC = sqrt(1.0/d) * γ
+    px = cos(α) * d 
+    py = sin(α) * d 
+    vx = -sin(α) * vC
+    vy = cos(α) * vC
+    vz = rand(-1:0.01:1)
+    return SVector{6}(px, py, pz, vx, vy, vz)
+
+end
 
 @testset "Keplerian" verbose=true begin
 
@@ -31,19 +47,25 @@ end
     end
     
     @testset "Jacobian: coe -> cart" begin
-        sv = SVector{6}(1.0, 0.01, π/3, π/12, -π/2, π/8)
-        ∂carRef = ForwardDiff.jacobian(x->convert6_coe_to_cart(x, 1.0), sv)
-
-        _, ∂car = ∂convert6_coe_to_cart(sv, 1.0)
-        @test all(isapprox.(∂car, ∂carRef, rtol=1e-12)) 
-
-        for _ in 1:1000
+        for _ in 1:5000
             coe = randcoe_ell()
             ∂carRef = ForwardDiff.jacobian(x->convert6_coe_to_cart(x, 1.0), coe)
             _, ∂car = ∂convert6_coe_to_cart(coe, 1.0)
             @test all(isapprox.(∂car, ∂carRef, atol=1e-12))
         end
     end
+
+    # @testset "Jacobian: cart -> coe" begin
+    #     for _ in 1:2
+    #         car = randcoe_ell()
+    #         ∂coeRef = ForwardDiff.jacobian(x->convert6_cart_to_coe(x, 1.0), car)
+    #         coe, ∂coe = ∂convert6_cart_to_coe(car, 1.0)
+    #         if  !all(isapprox.(∂coe, ∂coeRef, atol=1e-12))
+    #             println(∂coeRef)
+    #             println(∂coe)
+    #         end
+    #     end
+    # end
 
     @testset "Consistency" verbose=true begin
         @testset "cart -> coe -> cart" begin

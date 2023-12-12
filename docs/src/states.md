@@ -6,7 +6,6 @@
 convert6_cart_to_coe
 convert6_coe_to_cart
 
-∂convert6_cart_to_coe
 ∂convert6_coe_to_cart
 ```
 
