@@ -40,7 +40,7 @@
             sv = convert6_coe_to_cart([1.0, 0.05, 0.0, π/4, 0.0, 0.0], 1.0)
             equi = convert6_cart_to_equi(sv, 1.0)
 
-            @show sqrt(equi[2]^2 + equi[3]^2) ≈ 0.05        atol=1e-12 
+            @test sqrt(equi[2]^2 + equi[3]^2) ≈ 0.05   atol=1e-12 
             @test equi[end] ≈ π/4       atol=1e-12
         end
 
