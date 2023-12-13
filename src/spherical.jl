@@ -1,6 +1,11 @@
 export convert3_sphe_to_cart, convert3_cart_to_sphe,
        convert6_cart_to_sphe, convert6_sphe_to_cart
 
+"""
+    convert6_cart_to_sphe(sv::AbstractVector{<:Number}, [args]...)
+
+Convert cartesian state into spherical (ra-dec) representation.
+"""
 @fastmath function convert6_cart_to_sphe(sv::AbstractVector{<:Number}, args...) 
     @inbounds px, py, pz, vx, vy, vz = @views(sv[1:6]) 
     rxy2 = px*px + py*py
@@ -22,6 +27,11 @@ export convert3_sphe_to_cart, convert3_cart_to_sphe,
     return SVector{6}(r, α, δ, dr, dα, dδ)
 end
 
+"""
+    convert6_sphe_to_cart(sv::AbstractVector{<:Number}, [args]...)
+
+Convert spherical (ra-dec) state into cartesian representation.
+"""
 @fastmath function convert6_sphe_to_cart(rd::AbstractVector{<:Number}, args...)
     @inbounds r, α, δ, dr, dα, dδ = @views(rd[1:6])
 
@@ -41,6 +51,11 @@ end
     )
 end
 
+"""
+    convert3_cart_to_sphe(sv::AbstractVector{<:Number}, [args]...)
+
+Convert cartesian position into spherical (ra-dec).
+"""
 @fastmath function convert3_cart_to_sphe(sv::AbstractVector{<:Number}, args...) 
     @inbounds px, py, pz = @views(sv[1:3]) 
     rxy2 = px*px + py*py
@@ -51,6 +66,11 @@ end
     return SVector{3}(r, α, δ)
 end
 
+"""
+    convert6_sphe_to_cart(sv::AbstractVector{<:Number}, [args]...)
+
+Convert spherical (ra-dec) position into cartesian.
+"""
 @fastmath function convert3_sphe_to_cart(rd::AbstractVector{<:Number}, args...)
     @inbounds r, α, δ = @views(rd[1:3])
     sα, cα = sincos(α)
