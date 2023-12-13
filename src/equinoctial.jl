@@ -1,7 +1,6 @@
 export convert6_cart_to_equi, convert6_equi_to_cart, 
-       convert6_coe_to_equi, convert6_equi_to_coe, 
-       ∂convert6_coe_to_equi
-
+       convert6_coe_to_equi, convert6_equi_to_coe
+       
 """
     convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number, [args]...)
 
@@ -21,12 +20,12 @@ Cartesian representation of the state as a `SVector{6}`.
 function convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number, args...)
 
     @fastmath begin
-        @inbounds slr, ecx, ecy, inx, iny, tlo = @views(equi[1:6])
+        @inbounds p, f, g, h, k, L = @views(equi[1:6])
 
         # Compute eccentricity and true anomaly to check state validity in case of hyperbolic trajectory
-        ecc = sqrt( ecx*ecx + ecy*ecy )
+        ecc = sqrt( f*f + g*g )
         if ecc > 1.0
-            ν = mod2pi(tlo - atan(ecy, ecx))
+            ν = mod2pi(L - atan(g, f))
             if abs(ν) < acos(-1/ecc)
                 throw(
                     ErrorException("Invalid true longitude for hyperbolic trajectory!")
@@ -35,25 +34,25 @@ function convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number, args.
         end
     end
 
-    inx2 = inx*inx 
-    iny2 = iny*iny
-    ss = 1.0 + inx2 + iny2
-    sLon, cLon = sincos(tlo)
-    tmp1 = 2.0 * inx * iny
-    tmp2 = inx2 - iny2
-    tmp3 = cLon + ecx
-    tmp4 = sLon + ecy
+    h2 = h*h 
+    k2 = k*k
+    ss = 1.0 + h2 + k2
+    sLon, cLon = sincos(L)
+    tmp1 = 2.0 * h * k
+    tmp2 = h2 - k2
+    tmp3 = cLon + f
+    tmp4 = sLon + g
 
     ipx = ((tmp2 + 1.0) * cLon + tmp1 * sLon)/ss
     ipy = (-(tmp2 - 1.0) * sLon + tmp1 * cLon)/ss
-    ipz = 2.0*(inx * sLon - iny * cLon)/ss
+    ipz = 2.0*(h * sLon - k * cLon)/ss
     ivx = (tmp1 * tmp3 - (tmp2 + 1.0) * tmp4)/ss
     ivy = (-tmp1 * tmp4 - (tmp2 - 1.0) * tmp3)/ss
-    ivz = 2.0*(inx*tmp3 + iny*tmp4)/ss
+    ivz = 2.0*(h*tmp3 + k*tmp4)/ss
 
-    w = 1.0 + ecx * cLon + ecy * sLon
-    r = slr/w
-    v = sqrt(μ/slr)
+    w = 1.0 + f * cLon + g * sLon
+    r = p/w
+    v = sqrt(μ/p)
 
     return SVector{6}(r*ipx, r*ipy, r*ipz, v*ivx, v*ivy, v*ivz)
 
@@ -131,75 +130,14 @@ Equinoctial representation of the state as a `SVector{6}`.
     sr, cr = sincos(ran)
     ti2 = tan(0.5 * inc)
 
-    slr = sma * (1 - ecc*ecc)
-    ecx = ecc * cx 
-    ecy = ecc * cy 
-    inx = ti2 * cr 
-    iny = ti2 * sr
-    tlo = mod2pi(ran + aop + ta)
+    p = sma * (1 - ecc*ecc)
+    f = ecc * cx 
+    g = ecc * cy 
+    h = ti2 * cr 
+    k = ti2 * sr
+    L = mod2pi(ran + aop + ta)
     
-    return SVector{6}(slr, ecx, ecy, inx, iny, tlo)
-end
-
-"""
-    ∂convert6_coe_to_equi(coe::AbstractVector{<:Number}, [args]...)
-
-Convert classical orbital elements state vector to Equinoctial keplerian elements. 
-Compute also the full jacobian of the equinoctial elemenents wrt the classical
-orbital elements.
-
-### Inputs 
-- `coe` -- Keplerian elements -- `L, rad`
-
-### Output 
-Equinoctial representation of the state as a `SVector{6}` and its jacobian as 
-a `SMatrix{6, 6}`.
-
-### References 
-- Vallado, David A. - *Fundamentals of astrodynamics and applications*, 2013.
-"""
-@fastmath function ∂convert6_coe_to_equi(coe::AbstractVector{<:Number}, args...)
-    @inbounds sma, ecc, inc, ran, aop, ta = @views(coe[1:6]) 
-
-    # Support variables
-    cy, cx = sincos(ran + aop)
-    sr, cr = sincos(ran)
-    ti2 = tan(0.5 * inc)
-
-    slr = sma * (1 - ecc*ecc)
-    ecx = ecc * cx 
-    ecy = ecc * cy 
-    inx = ti2 * cr 
-    iny = ti2 * sr
-    tlo = mod2pi(ran + aop + ta)
-
-    # Derivatives
-    ∂slr_∂sma = 1 - ecc*ecc
-    ∂slr_∂ecc = -2*sma*ecc
-    ∂ecx_∂ecc = cx
-    ∂ecx_∂ran = -ecc*cy
-    ∂ecx_∂aop = -ecc*cy
-    ∂ecy_∂ecc = cy
-    ∂ecy_∂ran = ecc*cx
-    ∂ecy_∂aop = ecc*cx
-    ∂inx_∂inc = 0.5*(1 + ti2*ti2)*cr
-    ∂inx_∂ran = -ti2*sr
-    ∂iny_∂inc = 0.5*(1 + ti2*ti2)*sr
-    ∂iny_∂ran = ti2*cr
-    ∂tlo_∂ran = 1
-    ∂tlo_∂aop = 1
-    ∂tlo_∂ta = 1
-    
-    equi = SVector{6}(slr, ecx, ecy, inx, iny, tlo)
-    ∂equi = SMatrix{6, 6}(
-        ∂slr_∂sma, ∂slr_∂ecc,         0,         0,         0,        0,
-                0, ∂ecx_∂ecc,         0, ∂ecx_∂ran, ∂ecx_∂aop,        0,
-                0, ∂ecy_∂ecc,         0, ∂ecy_∂ran, ∂ecy_∂aop,        0,
-                0,         0, ∂inx_∂inc, ∂inx_∂ran,         0,        0,
-                0,         0, ∂iny_∂inc, ∂iny_∂ran,         0,        0,
-                0,         0,         0, ∂tlo_∂ran, ∂tlo_∂aop, ∂tlo_∂ta
-    )'
-    return equi, ∂equi
+    return SVector{6}(p, f, g, h, k, L)
 end
 
 """
@@ -236,7 +174,7 @@ function convert6_equi_to_coe(equi::AbstractVector{<:Number}, args...)
         ϕ = 0
     else
         ϕ = atan(g, f)
-        ω = mod2pi(λ - Ω)
+        ω = mod2pi(ϕ - Ω)
     end
     ν = mod2pi(L - ϕ)
     return SVector{6}(a, e, i, Ω, ω, ν)
