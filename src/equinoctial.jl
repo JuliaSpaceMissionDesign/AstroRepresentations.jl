@@ -2,7 +2,7 @@ export convert6_cart_to_equi, convert6_equi_to_cart,
        convert6_coe_to_equi, convert6_equi_to_coe
        
 """
-    convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number, [args]...)
+    convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number)
 
 Convert equinoctial state elements to cartesian state.
 
@@ -17,7 +17,7 @@ Cartesian representation of the state as a `SVector{6}`.
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*, 2013.
 - Cefola - DOI: 10.2514/6.1972-937
 """
-function convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number, args...)
+function convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number)
 
     @fastmath begin
         @inbounds p, f, g, h, k, L = @views(equi[1:6])
@@ -59,7 +59,7 @@ function convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number, args.
 end
 
 """
-    convert6_cart_to_equi(sv::AbstractVector{<:Number}, μ::Number, [args]...)
+    convert6_cart_to_equi(sv::AbstractVector{<:Number}, μ::Number)
 
 Convert cartesian state vector to Equinoctial keplerian elements.
 
@@ -74,7 +74,7 @@ Equinoctial representation of the state as a `SVector{6}`.
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*, 2013.
 - Cefola - DOI: 10.2514/6.1972-937
 """
-@fastmath function convert6_cart_to_equi(rv::AbstractVector{<:Number}, μ::Number, args...)
+@fastmath function convert6_cart_to_equi(rv::AbstractVector{<:Number}, μ::Number)
 
     @inbounds R = SVector{3}(rv[1], rv[2], rv[3])
     @inbounds V = SVector{3}(rv[4], rv[5], rv[6])
@@ -109,7 +109,7 @@ Equinoctial representation of the state as a `SVector{6}`.
 end
 
 """
-    convert6_coe_to_equi(coe::AbstractVector{<:Number}, [args]...)
+    convert6_coe_to_equi(coe::AbstractVector{<:Number})
 
 Convert classical orbital elements state vector to Equinoctial keplerian elements.
 
@@ -122,7 +122,7 @@ Equinoctial representation of the state as a `SVector{6}`.
 ### References 
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*, 2013.
 """
-@fastmath function convert6_coe_to_equi(coe::AbstractVector{<:Number}, args...)
+@fastmath function convert6_coe_to_equi(coe::AbstractVector{<:Number})
     @inbounds sma, ecc, inc, ran, aop, ta = @views(coe[1:6]) 
 
     # Support variables
@@ -141,7 +141,7 @@ Equinoctial representation of the state as a `SVector{6}`.
 end
 
 """
-    convert6_equi_to_coe(coe::AbstractVector{<:Number}, [args]...)
+    convert6_equi_to_coe(coe::AbstractVector{<:Number})
 
 Convert Equinoctial keplerian elements to classical orbital elements state vector .
 
@@ -154,7 +154,7 @@ Keplerian representation of the state as a `SVector{6}`.
 ### References 
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*, 2013.
 """
-function convert6_equi_to_coe(equi::AbstractVector{<:Number}, args...)
+function convert6_equi_to_coe(equi::AbstractVector{<:Number})
     @inbounds p, f, g, h, k, L = @views(equi[1:6])
     f2 = f*f 
     g2 = g*g

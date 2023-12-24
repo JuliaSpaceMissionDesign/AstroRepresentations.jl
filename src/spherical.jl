@@ -2,11 +2,11 @@ export convert3_sphe_to_cart, convert3_cart_to_sphe,
        convert6_cart_to_sphe, convert6_sphe_to_cart
 
 """
-    convert6_cart_to_sphe(sv::AbstractVector{<:Number}, [args]...)
+    convert6_cart_to_sphe(sv::AbstractVector{<:Number})
 
 Convert cartesian state into spherical (ra-dec) representation.
 """
-@fastmath function convert6_cart_to_sphe(sv::AbstractVector{<:Number}, args...) 
+@fastmath function convert6_cart_to_sphe(sv::AbstractVector{<:Number}) 
     @inbounds px, py, pz, vx, vy, vz = @views(sv[1:6]) 
     rxy2 = px*px + py*py
     rxy = sqrt(rxy2)
@@ -28,11 +28,11 @@ Convert cartesian state into spherical (ra-dec) representation.
 end
 
 """
-    convert6_sphe_to_cart(sv::AbstractVector{<:Number}, [args]...)
+    convert6_sphe_to_cart(sv::AbstractVector{<:Number})
 
 Convert spherical (ra-dec) state into cartesian representation.
 """
-@fastmath function convert6_sphe_to_cart(rd::AbstractVector{<:Number}, args...)
+@fastmath function convert6_sphe_to_cart(rd::AbstractVector{<:Number})
     @inbounds r, α, δ, dr, dα, dδ = @views(rd[1:6])
 
     sα, cα = sincos(α)
@@ -52,11 +52,11 @@ Convert spherical (ra-dec) state into cartesian representation.
 end
 
 """
-    convert3_cart_to_sphe(sv::AbstractVector{<:Number}, [args]...)
+    convert3_cart_to_sphe(sv::AbstractVector{<:Number})
 
 Convert cartesian position into spherical (ra-dec).
 """
-@fastmath function convert3_cart_to_sphe(sv::AbstractVector{<:Number}, args...) 
+@fastmath function convert3_cart_to_sphe(sv::AbstractVector{<:Number}) 
     @inbounds px, py, pz = @views(sv[1:3]) 
     rxy2 = px*px + py*py
     rxy = sqrt(rxy2)
@@ -67,11 +67,11 @@ Convert cartesian position into spherical (ra-dec).
 end
 
 """
-    convert6_sphe_to_cart(sv::AbstractVector{<:Number}, [args]...)
+    convert6_sphe_to_cart(sv::AbstractVector{<:Number})
 
 Convert spherical (ra-dec) position into cartesian.
 """
-@fastmath function convert3_sphe_to_cart(rd::AbstractVector{<:Number}, args...)
+@fastmath function convert3_sphe_to_cart(rd::AbstractVector{<:Number})
     @inbounds r, α, δ = @views(rd[1:3])
     sα, cα = sincos(α)
     sδ, cδ = sincos(δ)

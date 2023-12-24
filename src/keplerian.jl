@@ -1,7 +1,7 @@
 export convert6_cart_to_coe, convert6_coe_to_cart
 
 """
-    convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, [args]...)
+    convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number)
 
 Convert cartesian state representation into classical orbital elements.
 
@@ -16,7 +16,7 @@ Classical orbital elements representation of the state as a `SVector{6}`.
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
   Springer Science & Business Media, 2001.
 """
-@fastmath function convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number, args...)
+@fastmath function convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number)
 
     @inbounds R = SVector{3}(sv[1], sv[2], sv[3])
     @inbounds V = SVector{3}(sv[4], sv[5], sv[6])
@@ -57,7 +57,7 @@ Classical orbital elements representation of the state as a `SVector{6}`.
 end
 
 """
-    convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, [args]...)
+    convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number)
 
 Convert classical orbital elements state vector to cartesian state.
 
@@ -72,7 +72,7 @@ Cartesian representation of the state as a `SVector{6}`.
 - Vallado, David A. - *Fundamentals of astrodynamics and applications*. Vol. 12. 
   Springer Science & Business Media, 2001.
 """
-function convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number, args...) 
+function convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number) 
     @inbounds sma, ecc, inc, ran, aop, ta = @views(sv[1:6]) 
     p = sma*(1-ecc*ecc)
 

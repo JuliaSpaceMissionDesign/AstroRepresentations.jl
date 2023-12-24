@@ -9,4 +9,7 @@ include("keplerian.jl")
 include("equinoctial.jl")
 include("spherical.jl")
 
+include("types.jl")
+include("transform.jl")
+
 end
