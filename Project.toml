@@ -1,7 +1,7 @@
 name = "AstroRepresentations"
 uuid = "403ab190-7cad-4c95-848f-e576570a949d"
 authors = ["Andrea Pasquale"]
-version = "1.0.0-DEV"
+version = "0.1.0"
 
 [deps]
 JSMDUtils = "67801824-9821-48b9-a814-9bfb19231086"
@@ -10,6 +10,8 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 julia = "1"
+JSMDUtils = "1"
+StaticArrays = "1"
 
 [extras]
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
