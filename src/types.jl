@@ -1,28 +1,26 @@
 
-export Coe, Cart6, Cart3, Sphe6, Sphe3, Equi
+export Coe, Cart, Sphe, Equi
 
 # -----
 # Abstract 
 
-abstract type AbstractRepresentationX{D, N} <: FieldVector{D, N} end
+abstract type AbstractStateRepr{D, N} <: FieldVector{D, N} end
 
-abstract type AbstractRepresentation3{N} <: AbstractRepresentationX{3, N} end
-
-abstract type AbstractRepresentation6{N} <: AbstractRepresentationX{6, N} end
+abstract type AbstractStateRepr6{N} <: AbstractStateRepr{6, N} end
 
 # -----
 # 6D Representations
 
-struct Coe{N} <: AbstractRepresentation6{N}
+struct Coe{N} <: AbstractStateRepr6{N}
     sma::N 
     ecc::N 
     inc::N 
     ran::N
     aop::N 
-    tan::N
+    tra::N
 end
 
-struct Cart6{N} <: AbstractRepresentation6{N}
+struct Cart{N} <: AbstractStateRepr6{N}
     pox::N 
     poy::N 
     poz::N 
@@ -31,7 +29,7 @@ struct Cart6{N} <: AbstractRepresentation6{N}
     vez::N
 end
 
-struct Sphe6{N} <: AbstractRepresentation6{N}
+struct Sphe{N} <: AbstractStateRepr6{N}
     r::N 
     ras::N 
     dec::N 
@@ -40,11 +38,20 @@ struct Sphe6{N} <: AbstractRepresentation6{N}
     ddec::N
 end
 
-struct Equi{N} <: AbstractRepresentation6{N} 
+struct Equi{N} <: AbstractStateRepr6{N} 
     slr::N 
     ecx::N 
     ecy::N 
     inx::N 
     iny::N 
     lon::N
+end
+
+function Base.show(io::IO, ::MIME"text/plain", sv::R) where {R<:AbstractStateRepr}
+    D = length(sv)
+    println(io, "$D-element $(typeof(sv)) with indices SOneTo($D)")
+    for el in fieldnames(R)
+        val = getfield(sv, el)
+        println(io, " :$el => $(val)")
+    end
 end

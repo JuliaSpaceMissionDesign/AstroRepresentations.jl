@@ -6,8 +6,8 @@
         μ = 3.986004415e5  # km^3/s^2
         rv = SVector{6}(6524.834, 6862.875, 6448.296, 4.901327, 5.533756, -1.976341)
         kep = SVector{6}(36127.343, 0.832853, 87.869126, 227.8982603, 53.384930, 92.3351567)
-        coe = convert6_cart_to_coe(rv, μ)
-        rv_ = convert6_coe_to_cart(coe, μ)
+        coe = AstroRepresentations.convert6_cart_to_coe(rv, μ)
+        rv_ = AstroRepresentations.convert6_coe_to_cart(coe, μ)
 
         @test all((rv[1:3] - rv_[1:3]) .≤ 1e-8)  # 0.01 mm error
         @test all((rv[3:6] - rv_[3:6]) .≤ 1e-8) # 0.01 mm/s error
@@ -35,8 +35,8 @@
                                 vy = cos(α) * velC
                                 
                                 cart = SA[px, py, pz, vx, vy, 0.]
-                                kep = convert6_cart_to_coe(cart, μ)
-                                out = convert6_coe_to_cart(kep, μ)
+                                kep = AstroRepresentations.convert6_cart_to_coe(cart, μ)
+                                out = AstroRepresentations.convert6_coe_to_cart(kep, μ)
                                 @test all( isapprox.(cart[1:3], out[1:3], atol=1e-8*dist) )
                                 @test all( isapprox.(cart[4:end], out[4:end], atol=1e-8) )
                                 @test isapprox(norm(cart[1:3]), norm(out[1:3]), atol=1e-10*dist)
@@ -57,8 +57,8 @@
                             for aop in LinRange(-π, π, 6)
                                 for ta in LinRange(-π, π, 6)
                                     coe = SA[sma, ecc, inc, ran, aop, ta]
-                                    cart = convert6_coe_to_cart(coe, 1.)
-                                    out = convert6_cart_to_coe(cart, 1.)
+                                    cart = AstroRepresentations.convert6_coe_to_cart(coe, 1.)
+                                    out = AstroRepresentations.convert6_cart_to_coe(cart, 1.)
     
                                     @test isapprox(out[1], coe[1], atol=1e-12)
                                     @test isapprox(out[2], coe[2], atol=1e-9)
@@ -72,5 +72,37 @@
             end
         end
     end
+
+    @testset "Utils" verbose=true begin
+
+        funs = [:sma, :ecc, :inc, :ran, :aop, :tra, :slr, :ene, :mom, :aol]
+        dfuns = [Symbol("∂$f") for f in funs]
+    
+        for (f, df) in zip(funs, dfuns)
+    
+            @testset "$f/$df" verbose=true begin 
+                for _ in 1:10
+                    @eval begin 
+                        # sv = convert_state(Cart, Coe(randcoe_ell()), 1.0)
+                        sv = Cart(randcart())
+                        valref = AstroRepresentations.$(f)(sv, 1.0)
+                        val, ∂val = AstroRepresentations.$(df)(sv, 1.0) 
+
+                        @test isapprox(val, valref; rtol=1e-12)
+
+                        ∂ref = ForwardDiff.gradient(
+                            x->AstroRepresentations.$(f)(x, 1.0), 
+                            sv
+                        )
+
+                        if !any(isnan.(∂ref))
+                            @test all(isapprox.(∂ref, ∂val; rtol=1e-10))
+                        end
+                        
+                    end
+                end
+            end
+        end
+    end;
 
 end;

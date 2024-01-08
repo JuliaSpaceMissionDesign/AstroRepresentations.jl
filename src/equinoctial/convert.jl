@@ -1,5 +1,19 @@
-export convert6_cart_to_equi, convert6_equi_to_cart, 
-       convert6_coe_to_equi, convert6_equi_to_coe
+
+function convert_state(::Type{Equi}, c::Cart{N}, μ::Number, args...) where N 
+    return Equi{N}(convert6_cart_to_equi(c, μ))
+end
+
+function convert_state(::Type{Cart}, c::Equi{N}, μ::Number, args...) where N 
+    return Cart{N}(convert6_equi_to_cart(c, μ)) 
+end
+
+function convert_state(::Type{Equi}, c::Coe{N}, args...) where N 
+    return Equi{N}(convert6_coe_to_equi(c))
+end
+
+function convert_state(::Type{Coe}, c::Equi{N}, args...) where N 
+    return Coe{N}(convert6_equi_to_coe(c))
+end
        
 """
     convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number)

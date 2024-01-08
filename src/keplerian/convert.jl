@@ -1,4 +1,11 @@
-export convert6_cart_to_coe, convert6_coe_to_cart
+
+function convert_state(::Type{Coe}, c::Cart{N}, μ::Number, args...) where N
+    return Coe{N}(convert6_cart_to_coe(c, μ))
+end
+
+function convert_state(::Type{Cart}, c::Coe{N}, μ::Number, args...) where N 
+    return Cart{N}(convert6_coe_to_cart(c, μ))
+end
 
 """
     convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number)

@@ -1,5 +1,11 @@
-export convert3_sphe_to_cart, convert3_cart_to_sphe,
-       convert6_cart_to_sphe, convert6_sphe_to_cart
+
+function convert_state(::Type{Sphe}, c::Cart{N}, args...) where N 
+    return Sphe{N}(convert6_cart_to_sphe(c))
+end
+
+function convert_state(::Type{Cart}, c::Sphe{N}, args...) where N 
+    return Cart{N}(convert6_sphe_to_cart(c))
+end
 
 """
     convert6_cart_to_sphe(sv::AbstractVector{<:Number})

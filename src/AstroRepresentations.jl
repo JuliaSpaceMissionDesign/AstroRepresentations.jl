@@ -5,11 +5,18 @@ using LinearAlgebra
 using JSMDUtils.Math: skew
 
 include("angles.jl")
-include("keplerian.jl")
-include("equinoctial.jl")
-include("spherical.jl")
-
 include("types.jl")
-include("transform.jl")
+include("convert.jl")
+
+# Classical orbital elements
+include("keplerian/convert.jl")
+include("keplerian/util.jl")
+
+# Equinoctial orbital elements
+include("equinoctial/convert.jl")
+
+# Spherical state representation
+include("spherical/convert.jl")
+
 
 end
