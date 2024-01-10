@@ -402,7 +402,6 @@ function ∂aop(sv, μ::Number, args...)
     return ω, ∂ω
 end
 
-
 function slr(sv, μ::Number, args...)
     @inbounds R = SVector{3}(sv[1], sv[2], sv[3])
     @inbounds V = SVector{3}(sv[4], sv[5], sv[6])

@@ -10,6 +10,7 @@ include("convert.jl")
 
 # Classical orbital elements
 include("keplerian/convert.jl")
+include("keplerian/jac.jl")
 include("keplerian/util.jl")
 
 # Equinoctial orbital elements

@@ -73,6 +73,27 @@
         end
     end
 
+    @testset "Jacobians" verbose=true begin 
+        @testset "cart->coe" verbose=true begin
+            for _ in 1:1000
+                sv = randcart()
+                ref = ForwardDiff.jacobian(
+                    x->AstroRepresentations.convert6_cart_to_coe(x, 1.0), sv
+                )
+                if !any(isnan.(ref))
+                    _, jac = AstroRepresentations.∂convert6_cart_to_coe(sv, 1.0)
+        
+                    if !any(isnan.(jac))
+                        @test all(isapprox.(ref, jac; atol=1e-12, rtol=1e-12))
+                    else
+                        @test_broken all(isapprox.(ref, jac; atol=1e-12, rtol=1e-12))
+                    end
+                end
+            end
+        end
+
+    end
+
     @testset "Utils" verbose=true begin
 
         funs = [:sma, :ecc, :inc, :ran, :aop, :tra, :slr, :ene, :mom, :aol]
