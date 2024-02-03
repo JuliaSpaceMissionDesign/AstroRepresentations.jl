@@ -1,15 +1,5 @@
 # State Transformations
 
-## Generic 
-
-```@docs
-Cart
-Coe 
-Equi 
-Sphe
-convert_state
-```
-
 ## Classical Orbital Elements (coe)
 
 ```@docs 
