@@ -1,7 +1,7 @@
 name = "AstroRepresentations"
 uuid = "403ab190-7cad-4c95-848f-e576570a949d"
-authors = ["Andrea Pasquale"]
-version = "0.1.0"
+authors = ["Andrea Pasquale <andrea.pasquale@polimi.it>"]
+version = "0.2.0"
 
 [deps]
 JSMDUtils = "67801824-9821-48b9-a814-9bfb19231086"
