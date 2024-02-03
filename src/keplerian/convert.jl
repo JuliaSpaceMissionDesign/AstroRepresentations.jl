@@ -53,14 +53,14 @@ Classical orbital elements representation of the state as a `SVector{6}`.
 
     # check circular orbits 
     if ecc > 1e-14
-        ta = atan(sqrt(p/μ)*dot(R, V), p-r)
-        aop = mod2pi(aol - ta)
+        tra = atan(sqrt(p/μ)*dot(R, V), p-r)
+        aop = mod2pi(aol - tra)
     else 
-        ta = mod2pi(aol) 
+        tra = mod2pi(aol) 
         aop = 0.
     end
 
-    return SVector{6}(sma, ecc, inc, ran, aop, ta)
+    return SVector{6}(sma, ecc, inc, ran, aop, tra)
 end
 
 """
@@ -80,10 +80,10 @@ Cartesian representation of the state as a `SVector{6}`.
   Springer Science & Business Media, 2001.
 """
 function convert6_coe_to_cart(sv::AbstractVector{<:Number}, μ::Number) 
-    @inbounds sma, ecc, inc, ran, aop, ta = @views(sv[1:6]) 
+    @inbounds sma, ecc, inc, ran, aop, tra = @views(sv[1:6]) 
     p = sma*(1-ecc*ecc)
 
-    stan, ctan = sincos(ta)
+    stan, ctan = sincos(tra)
     r = p/(1 + ecc*ctan)
     sran, cran = sincos(ran)
     sinc, cinc = sincos(inc)
