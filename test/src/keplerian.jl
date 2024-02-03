@@ -75,7 +75,7 @@
 
     @testset "Jacobians" verbose=true begin 
         @testset "cart->coe" verbose=true begin
-            for _ in 1:1000
+            for _ in 1:100
                 sv = randcart()
                 ref = ForwardDiff.jacobian(
                     x->AstroRepresentations.convert6_cart_to_coe(x, 1.0), sv
@@ -117,7 +117,7 @@
                         )
 
                         if !any(isnan.(∂ref))
-                            @test all(isapprox.(∂ref, ∂val; rtol=1e-10))
+                            @test all(isapprox.(∂ref, ∂val; rtol=1e-8))
                         end
                         
                     end

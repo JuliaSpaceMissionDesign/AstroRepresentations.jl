@@ -1,5 +1,4 @@
 @fastmath function ∂convert6_cart_to_coe(sv::AbstractVector{<:Number}, μ::Number)
-    # TODO: this function is not allocations free! Update
 
     @inbounds R = SVector{3}(sv[1], sv[2], sv[3])
     @inbounds V = SVector{3}(sv[4], sv[5], sv[6])
@@ -127,5 +126,6 @@
     end
 
     ∂M = hcat(∂a, ∂e, ∂i, ∂Ω, ∂ω, ∂f)
-    return SVector{6}(a, e, i, Ω, ω, f), ∂M'
+    return SA[a, e, i, Ω, ω, f], ∂M'
+
 end
