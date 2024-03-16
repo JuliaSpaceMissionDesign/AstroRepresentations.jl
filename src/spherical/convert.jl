@@ -10,7 +10,7 @@ end
 """
     convert6_cart_to_sphe(sv::AbstractVector{<:Number})
 
-Convert cartesian state into spherical (ra-dec) representation.
+Convert cartesian state into spherical (az-el) representation.
 """
 @fastmath function convert6_cart_to_sphe(sv::AbstractVector{<:Number}) 
     @inbounds px, py, pz, vx, vy, vz = @views(sv[1:6]) 
@@ -36,7 +36,7 @@ end
 """
     convert6_sphe_to_cart(sv::AbstractVector{<:Number})
 
-Convert spherical (ra-dec) state into cartesian representation.
+Convert spherical (az-el) state into cartesian representation.
 """
 @fastmath function convert6_sphe_to_cart(rd::AbstractVector{<:Number})
     @inbounds r, α, δ, dr, dα, dδ = @views(rd[1:6])
@@ -60,7 +60,7 @@ end
 """
     convert3_cart_to_sphe(sv::AbstractVector{<:Number})
 
-Convert cartesian position into spherical (ra-dec).
+Convert cartesian position into spherical (az-el).
 """
 @fastmath function convert3_cart_to_sphe(sv::AbstractVector{<:Number}) 
     @inbounds px, py, pz = @views(sv[1:3]) 
@@ -75,7 +75,7 @@ end
 """
     convert6_sphe_to_cart(sv::AbstractVector{<:Number})
 
-Convert spherical (ra-dec) position into cartesian.
+Convert spherical (az-el) position into cartesian.
 """
 @fastmath function convert3_sphe_to_cart(rd::AbstractVector{<:Number})
     @inbounds r, α, δ = @views(rd[1:3])

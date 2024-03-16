@@ -40,7 +40,7 @@ function convert6_equi_to_cart(equi::AbstractVector{<:Number}, μ::Number)
         ecc = sqrt( f*f + g*g )
         if ecc > 1.0
             ν = mod2pi(L - atan(g, f))
-            if abs(ν) < acos(-1/ecc)
+            if abs(ν) > acos(-1/ecc)
                 throw(
                     ErrorException("Invalid true longitude for hyperbolic trajectory!")
                 )

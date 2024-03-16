@@ -2,7 +2,7 @@ module AstroRepresentations
 
 using StaticArrays
 using LinearAlgebra
-using JSMDUtils.Math: skew
+using JSMDUtils.Math: skew, unitvec
 
 include("angles.jl")
 include("types.jl")
@@ -18,6 +18,9 @@ include("equinoctial/convert.jl")
 
 # Spherical state representation
 include("spherical/convert.jl")
+
+# Vinf state representation
+include("vinf.jl")
 
 
 end
